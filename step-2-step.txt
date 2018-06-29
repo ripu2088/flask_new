@@ -1,7 +1,29 @@
+Step to install Python3, flask along with DB(mysql).
+
+1. sudo apt-get install python3 python3-dev libmysqlclient-dev python3-pip python3-flask
+2. sudo apt-get install mysql-server
+3. Provide root password at installtion time.
+4. Connect mysql to create user and databas.
+5. mysql -uroot -p
+	>create user 'flaskdb'@'localhost' IDENTIFIED BY 'flaskdb';
+	>CREATE database flask_db;
+	> GRANT ALL PRIVILEGES ON flask_db.* TO 'flaskdb'@'localhost';
+6. Exit out to mysql and reconnect DB with provided user.
+7. mysql -uflaskdb -pflaskdb flask_db;
+	>CREATE TABLE users( ID INT(11) PRIMARY KEY AUTO_INCREMENT, username VARCHAR(20) NOT NULL, firstname VARCHAR(20) NOT NULL, lastname VARCHAR(20) NOT NULL);
+	>insert into users INSERT INTO users (username, firstname, lastname) VALUES('kumar', 'Raj', 'kumar');
+	>exit;
+8. now install flask module along with mysql
+	pip3 install flask
+	pip3 install flask-mysqldb
+9. All installation has been done and now create a pyhton script file and provide the details(app.py)
+	 File Content : 
+
+
 from flask import Flask
 
 import MySQLdb
-import gc
+import gc 
 #Garbage collector
 app = Flask(__name__)
 
@@ -11,9 +33,9 @@ app.debug = True
 def connection():
 	conn = MySQLdb.connect(
 		host = "localhost",
-		user = "flaskdb",
-		passwd = "flaskdb",
-		db = "flask_db"
+		user = "flask",
+		passwd = "flask",
+		db = "flask"
 		)
 
 	c = conn.cursor()
@@ -40,7 +62,7 @@ def get_data():
 	data = 'Name of Users: <br>'
 	for user in users:
 		data = data + user[1] + ': ' \
-		+ user[2] + ' ' + user[3] + '<br>'
+		+ user[2] + user[3] + '<br>'
 
 	gc.collect()
 	return data
@@ -110,7 +132,7 @@ def list_data(lastname=None):
 			data = 'Name of Users: <br>'
 			for user in users:
 				data = data + user[1] + ': ' \
-				+ user[2] + ' ' + user[3] + '<br>'
+				+ user[2] + user[3] + '<br>'
 
 			gc.collect()
 			return 'List lastname user: ' + data
@@ -122,3 +144,52 @@ def list_data(lastname=None):
 
 if __name__ == "__main__":
 	app.run()
+
+10. Now check pyhton script and run it.
+
+#python3 app.py(application name)
+
+11. Check the details on GUI 
+
+i).	http://localhost:5000/
+
+	    Please follow links to make use of MySQL Database:
+	1. /get/ - get all users
+	2. /username/ - get particular user
+	3. /delete/username/ - delete user with username
+	4. /insert/username/firstname/lastname/ - insert user
+	5. /lastname/lastname/ - list the users with lastname 
+
+ii).	http://localhost:5000/get/
+	
+	Name of Users:
+	Tarun: Tarun kumar
+	Tarun: Tarun Singh
+	Avnik: Avnik Kumar
+	Ashish: Ashish Mishra
+	Ashish: Ashish Tiwari
+	Ashish: Ashish kumar
+	Awadhesh: Awadhesh sharma
+	harish: harish kumar
+	harish: harish sharma
+	teja: Teja Kumar
+
+
+iii). 	http://localhost:5000/teja
+	Teja Kumar
+
+iv). 	http://localhost:5000/delete/teja
+	Data delected successfully with useraname: teja
+
+v). 	http://localhost:5000/insert/teja/Teja/kumar
+	Data inserted successfully: teja, Teja kumar
+
+vi). 	http://localhost:5000/lastname/kumar
+	List lastname user: Name of Users:
+	Tarun: Tarun kumar
+	Avnik: Avnik Kumar
+	Ashish: Ashish kumar
+	harish: harish kumar
+	teja: Teja kumar
+
+
