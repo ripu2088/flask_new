@@ -1,0 +1,76 @@
+from flask import Flask
+
+import MySQLdb
+import gc
+
+app = Flask(__name__)
+
+app.debug = True
+
+# database connection method
+def connection():
+    conn = MySQLdb.connect(
+        host = "localhost",
+        user = "flaskdb",
+        passwd = "flaskdb",
+        db = "flask_db"
+    )
+
+    c = conn.cursor()
+
+    return c, conn
+
+
+c, con = connection()
+
+# default routing provies reference to all routes
+@app.route("/")
+def hello():
+        return 'Please follow links to make use of MySQL Database: <br>' \
+                '1. /get/ - get all users <br>' \
+                '2. /lastname/lastname/ - get all user list with lastname <br>' \
+
+# getting all registered user data
+# e.g. http://localhost:5000/get/
+@app.route("/get/")
+def get_data():
+
+    c.execute("SELECT * FROM users")
+    users = c.fetchall()
+
+    data = 'Name of Users: <br>'
+    for user in users:
+        data = data + user[1] + ': ' \
+	+ user[2] + ' ' + user[3] + '<br>'
+
+    gc.collect()
+
+    return data
+
+# getting all registered user data
+# e.g. http://localhost:5000/lastname/kumar
+@app.route("/lastname/")
+@app.route("/lastname/<lastname>/")
+def lastname(lastname=None):
+      if lastname != None:
+        try:
+     c.execute("SELECT * FROM users WHERE lastname=%s", [
+	lastname,
+	])
+
+     users = c.fetchall()
+
+	data = 'Name of Users: <br>'
+	for user in users:
+	data = data + user[1] + ': ' \
+      + user[2] + user[3] + '<br>'
+
+    gc.collect()
+
+    return data
+        except:
+            return "LastName couldn't be found"
+    else:
+        return 'Please try again!'
+if __name__ == "__main__":
+    app.run()
